@@ -39,6 +39,33 @@ def scan_dataset(dataset, column = 'B_M'):
     for col in dataset.columns:
        print(col)
 
+#Create the columns with the labels of signal =1 and background=0
+column_of_label_signal=np.empty(dataset_signal.shape[0],dtype = float)
+column_of_label_signal.fill(1)
+print('size of new column with signal labels: ',column_of_label_signal.size)
+print(column_of_label_signal)
+
+column_of_label_bkg=np.empty(dataset_bkg.shape[0],dtype = float)
+column_of_label_signal.fill(0)
+print('size of new column with background labels: ',column_of_label_bkg.size)
+
+#transform the dataset in numpy array and add the new column with the label
+data_frame_signal=pd.DataFrame(dataset_signal)
+data_frame_bkg=pd.DataFrame(dataset_bkg)
+
+array_signal_training =np.array(data_frame_signal.values)
+array_bkg_training = np.array(data_frame_bkg.values)
+
+print('size of numpy array of signal : ',array_signal_training.size)
+print('size of numpy array of background : ',array_bkg_training.size)
 
 
-#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
+
+
+
+
+
+
+
+
+
