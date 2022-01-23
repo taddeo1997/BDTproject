@@ -34,11 +34,11 @@ class DecisionStump:
             predictions[X_column > self.threshold] = -1
             return predictions
         
-class Adaboost_algorithm:
+class Adaboost_Algorithm:
     
     def __init__(self, n_of_classifier = 5):
-        self.n_of_classifier_ = n_of_classifier
-        
+        self.n_of_classifier = n_of_classifier
+        self.classifiers = []
 
     #the method fit need has arguments the training sample X, and the labels y
     def fit(self, X, y):
@@ -52,7 +52,7 @@ class Adaboost_algorithm:
         
         #create a list to store all the classifier (decision stumps)
         self.classifiers = []
-        for _ in range(self.n_of_calssifier):
+        for _ in range(self.n_of_classifier):
             classifier = DecisionStump()
             
             #I have to find the feature and the thersold 
@@ -72,14 +72,6 @@ class Adaboost_algorithm:
                     weight_misclassified= weight[y != predictions]
                     error= sum(weight_misclassified)
                     
-                    count_array_y=np.bincount(y)
-                    count_array_predictions=np.bincount(predictions)
-                    
-                    #Compute gini coeff
-                    Gini_neg = 1 - (count_array_y[-1]/count_array_predictions[-1])**2 (count_array_y[+1]/count_array_predictions[-1])**2
-                    Gini_pos = 1 - (count_array_y[-1]/count_array_predictions[+1])**2 (count_array_y[+1]/count_array_predictions[+1])**2
-                    classifier.Gini=(count_array_predictions[-1]/n_of_samples)*Gini_neg + (count_array_predictions[+1]/n_of_samples)*Gini_pos
-            
                     #flip the error if it's larger then 0.5
                     if error > 0.5:
                         error= 1-error
