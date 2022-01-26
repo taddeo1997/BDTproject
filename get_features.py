@@ -10,19 +10,20 @@ import pandas as pd
 from pandas import read_csv
 import numpy as np
 
-def get_features():
+def get_features(signal, bkg):
     """This function compute the variable needed for thetraining from the variable in the dataset"""
     
-    columns=['B_ENDVERTEX_Z','B_ENDVERTEX_ZERR','B_M','B_DTF_chi2','B_DTF_nDOF','D0_ENDVERTEX_Z','D0_ENDVERTEX_ZERR','D0_FDCHI2_OWNPV','P1_IPCHI2_OWNPV','P1_PT','P2_IPCHI2_OWNPV','P2_PT','m_corr','nSPDHits']
+    #columns=['B_ENDVERTEX_Z','B_ENDVERTEX_ZERR','B_M','B_DTF_chi2','B_DTF_nDOF','D0_ENDVERTEX_Z','D0_ENDVERTEX_ZERR','D0_FDCHI2_OWNPV','P1_IPCHI2_OWNPV','P1_PT','P2_IPCHI2_OWNPV','P2_PT','m_corr','nSPDHits']
 
     #Read the file cvs
-    dataset_signal = read_csv('Kpi_2018_signal.csv', names=columns)
-    dataset_bkg = read_csv('pipi_2018_bkg.csv', names=columns)
+    #dataset_signal = read_csv('Kpi_2018_signal.csv', names=columns)
+    #dataset_bkg = read_csv('pipi_2018_bkg.csv', names=columns)
     
     #Transform the dataset in pandas data frame
-    data_frame_signal = pd.DataFrame(dataset_signal)
-    data_frame_bkg = pd.DataFrame(dataset_bkg)
-    
+    #data_frame_signal = pd.DataFrame(dataset_signal)
+    #data_frame_bkg = pd.DataFrame(dataset_bkg)
+    data_frame_signal = signal
+    data_frame_bkg = bkg
     
     print("Initial DataFrame:")
     print(data_frame_signal, "\n")
@@ -75,6 +76,7 @@ def get_features():
     print(data_frame_signal, "\n")
     print(data_frame_bkg, "\n")
     
+    return data_frame_signal, data_frame_bkg
     
     
     
