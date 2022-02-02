@@ -17,13 +17,13 @@ class DecisionStump:
         #threshold of the feature, for the decision of the stump
         self.threshold = None
         #the amount of say of a stump indicates how well the stamp classifies
-        self.amount_of_say = None
+        self.alpha = None
     
     #I want to compare a feature of the sample X, set a thersold and set +1
     #or -1 if the event has X larger or smaller then the thershold
     def predict(self, X):
         number_of_samples= X.shape[0]
-        X_column = X[:, self.feautre_index]
+        X_column = X[:, self.feature_index]
         
         #predictions array is default equal to 1, with the size of the sample
         predictions = np.ones(number_of_samples)
@@ -59,10 +59,12 @@ class Adaboost_Algorithm:
             #for which this error is miminum
             min_error = float('inf')
             for feature_i in range(n_of_features):
+                print('training of feature {}'.format(feature_i))
                 X_column = X[:, feature_i]
                 thresholds = np.unique(X_column)
                 
                 for threshold_i in thresholds:
+                    #print('threshold {}'.format(threshold_i))
                     pol = 1
                     predictions = np.ones(n_of_samples)
                     predictions[X_column < threshold_i] = -1
@@ -98,11 +100,11 @@ class Adaboost_Algorithm:
             #save the classifier
             self.classifiers.append(classifier)
             
-        def predict(self, X):
-            classifier_pred = [classifier.alhpa * classifier.predict(X) for classifier in self.classifiers]
-            y_pred = np.sum(classifier_pred, axis = 0)
-            y_pred = np.sign(y_pred)
-            return y_pred
+    def predict(self, X):
+        classifier_pred = [classifier.alhpa * classifier.predict(X) for classifier in self.classifiers]
+        y_pred = np.sum(classifier_pred, axis = 0)
+        y_pred = np.sign(y_pred)
+        return y_pred
             
         
         

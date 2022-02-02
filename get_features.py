@@ -46,10 +46,10 @@ def get_features(signal, bkg):
     data_frame_signal['B_DTF_nDOF'] = pd.to_numeric(data_frame_signal['B_DTF_nDOF'], downcast='float')
     data_frame_bkg['B_DTF_nDOF'] = pd.to_numeric(data_frame_bkg['B_DTF_nDOF'], downcast='float')
     
-    print(data_frame_signal['B_DTF_chi2'])
-    print(data_frame_bkg['B_DTF_chi2'])
-    print(data_frame_signal['B_DTF_nDOF'])
-    print(data_frame_bkg['B_DTF_nDOF'])
+    #print(data_frame_signal['B_DTF_chi2'])
+    #print(data_frame_bkg['B_DTF_chi2'])
+    #print(data_frame_signal['B_DTF_nDOF'])
+    #print(data_frame_bkg['B_DTF_nDOF'])
     
     #compute the new columns
     data_frame_signal['log(D0_FDCHI2_OWNPV)'] = data_frame_signal.apply(lambda column: np.log(column.D0_FDCHI2_OWNPV), axis=1)
@@ -65,9 +65,9 @@ def get_features(signal, bkg):
     data_frame_bkg[' B_DTF_chi2/B_DTF_nDOF'] = data_frame_bkg.apply(lambda column:  column.B_DTF_chi2/column.B_DTF_nDOF, axis=1)
     
     
-    print("DataFrame after the addition of new columns")
-    print(data_frame_signal, "\n")
-    print(data_frame_bkg, "\n")
+    #print("DataFrame after the addition of new columns")
+    #print(data_frame_signal, "\n")
+    #print(data_frame_bkg, "\n")
     
     data_frame_signal.drop(['B_ENDVERTEX_Z','B_ENDVERTEX_ZERR','B_DTF_chi2','B_DTF_nDOF','D0_ENDVERTEX_Z','D0_ENDVERTEX_ZERR','D0_FDCHI2_OWNPV','P1_IPCHI2_OWNPV','P2_IPCHI2_OWNPV'], axis=1, inplace=True)
     data_frame_bkg.drop(['B_ENDVERTEX_Z','B_ENDVERTEX_ZERR','B_DTF_chi2','B_DTF_nDOF','D0_ENDVERTEX_Z','D0_ENDVERTEX_ZERR','D0_FDCHI2_OWNPV','P1_IPCHI2_OWNPV','P2_IPCHI2_OWNPV'], axis=1, inplace=True)       
