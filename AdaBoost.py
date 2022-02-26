@@ -62,7 +62,7 @@ class Adaboost_Algorithm:
         #SECOND ATTRIBUTE
         self.classifiers = []
 
-    #the method fit need has arguments the features and the labels of the training sample X and  y
+    #the method fit need as arguments the features and the labels of the training sample X and  y
     def fit(self, X, y):
         
         n_of_samples, n_of_features= X.shape

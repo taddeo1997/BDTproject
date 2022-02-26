@@ -6,92 +6,73 @@ Created on Thu Jan 20 16:42:08 2022
 @author: lucatoscano
 """
 #Import Libraries
-import pandas as pd
 import numpy as np
 from pandas import read_csv
-from sklearn.model_selection import train_test_split
 from get_features import get_features
-from AdaBoost import Adaboost_Algorithm
+import pickle
+import matplotlib.pyplot as plt
 
 
-def get_dataset(csv_signal,csv_bkg):
-    """This function transform the dataset contained in the csv file in numpy array for the training"""
+
+def Classification (csv_dataset, model):
+    columns=['B_ENDVERTEX_Z','B_ENDVERTEX_ZERR','B_M','B_DTF_chi2','B_DTF_nDOF','D0_ENDVERTEX_Z','D0_ENDVERTEX_ZERR','D0_FDCHI2_OWNPV','P1_IPCHI2_OWNPV','P1_PT','P2_IPCHI2_OWNPV','P2_PT','m_corr','nSPDHits','D0_M']
+
+    raw_dataset = read_csv(csv_dataset, names=columns)
     
-    columns=['B_ENDVERTEX_Z','B_ENDVERTEX_ZERR','B_M','B_DTF_chi2','B_DTF_nDOF','D0_ENDVERTEX_Z','D0_ENDVERTEX_ZERR','D0_FDCHI2_OWNPV','P1_IPCHI2_OWNPV','P1_PT','P2_IPCHI2_OWNPV','P2_PT','m_corr','nSPDHits']
-
-    #Read the file cvs
-    dataset_signal = read_csv(csv_signal, names=columns)
-    dataset_bkg = read_csv(csv_bkg, names=columns)
+    #the invariant mass of D0 is not used for the traonign, only for show the final results
+    D0_mass_column = raw_dataset.iloc[:,-1:]
     
-    print('Size of dataset of signal in the csv: {}'.format(dataset_signal.shape))
-    print('Size of dataset of background in the csv: {}'.format(dataset_bkg.shape))
+    array_D0_mass_column = np.array(D0_mass_column.values)
     
-    #Call the get_features function for compute the columns of the features from the datasets
-    data_frame_signal, data_frame_bkg = get_features(dataset_signal, dataset_bkg)
+    raw_dataset.drop('D0_M',axis=1, inplace=True)
     
-
-    #Transform the dataset in numpy array
-    #data_frame_signal = pd.DataFrame(dataset_signal)
-    #data_frame_bkg = pd.DataFrame(dataset_bkg)
-    array_signal = np.array(data_frame_signal.values)
-    array_bkg = np.array(data_frame_bkg.values)
-
-
+    #the 10 kinematic variable are computed from the raw database by the function get_features
+    dataset = get_features(raw_dataset)
     
-    #print('Size of numpy array of signal: {}'.format(array_signal.shape))
-    #print(array_signal)
-    #print('\n''\n')
-    #print('Size of numpy array of background:{} '.format(array_bkg.shape))
-    #print(array_bkg)
-
-    #Create the columns with the labels of signal =1 and background=-1
-    column_of_label_signal = np.ones(array_signal.shape[0])
-    column_of_label_bkg = np.empty(array_bkg.shape[0],dtype = int)
-    column_of_label_bkg.fill(-1)
+    array_dataset = np.array(dataset.values)
     
-    #print('Size of new column with signal labels: {}'.format(column_of_label_signal.size))
-    #print(column_of_label_signal)
-    #print('Size of new column with background labels: {}'.format(column_of_label_bkg.size))
-    #print(column_of_label_bkg)
     
-
-    #Merge the array with the signal and the array with the bkg for both labels and features
-    array_y = np.concatenate((column_of_label_signal,column_of_label_bkg), axis=0)
-    array_X = np.concatenate((array_signal,array_bkg), axis=0)
-    #print('Final array of the labels: \n')
-    #print(array_y)
-    #print('Final array of the features: \n')
-    #print(array_X)
-
-    #split the array in test sample and training sample
-    X_train, X_validation, y_train, y_validation = train_test_split(array_X, array_y, test_size=0.20, random_state=1)
-    print('Size of X_train: {} \n'.format(X_train.shape))
-    print('Size of X_validation: {} \n'.format(X_validation.shape))
-    print('Size of y_train: {} \n'.format(y_train.shape))
-    print('Size of y_validation: {} \n'.format(y_validation.shape))
-
-
-    return X_train, X_validation, y_train, y_validation
-
-
-def accurancy (label_true, label_predicted):
-    """This function which gives the accurancy of the algorithm"""
     
-    accurancy = np.sum(label_true == label_predicted) / len(label_true) 
-    return accurancy
+    # load the model from disk
+    loaded_classification = pickle.load(open(model, 'rb'))
+    array_predicted_label = loaded_classification.predict(array_dataset)
+    
+    
+    #the arrays of the features, the D0 mass and the predicted labels are merged to extract the value of signal and bkg
+    classified_dataset =  np.c_[ array_dataset, array_D0_mass_column,array_predicted_label ]  
+ 
+    
+    #the +1 label is for the signal, -1 for bkg
+    signal_dataset = classified_dataset[np.where(classified_dataset[:,-1] ==1)]
+    bkg_dataset = classified_dataset[np.where(classified_dataset[:,-1] ==-1)]
+    
+    # sum of the lenghts of the signal_dataset and bkg dataset must be equal to the lenght of the classified_database
+    def test_weight_normalization():
+        
+        assert len(signal_dataset)+len(bkg_dataset)==len(classified_dataset)
+    
+ 
+    plt.hist(array_D0_mass_column, 50, label='signal+bkg' )
+    plt.hist(signal_dataset[:,-2], 50, label='signal')
+    plt.xlim([1820, 1950])
+    plt.xlabel("D0 invariant mass")
+    plt.ylabel("Events")
+    plt.legend(loc='upper right')
+    plt.title("Distribution D0 invariant mass (signal+bkg)")
+    plt.show
 
 
-def training (csv_signal,csv_bkg):
-    """This function performes the training of the algorithm"""
-    
-    X_train, X_validation, y_train, y_validation = get_dataset(csv_signal,csv_bkg)
-    classification = Adaboost_Algorithm(n_of_classifier = 2)
-    
-    print('The training is starting ...')
-    
-    classification.fit(X_train, y_train)
-    acc=accurancy(y_validation,y_train)
-    print('The accurancy of the algorithm is : ',acc)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
